@@ -1,68 +1,119 @@
 # Playwright E2E Framework Template 🎭
 
-Professional End-to-End Test Suite für die TestShop Applikation. Dieses Repository implementiert eine skalierbare Test-Architektur basierend auf dem Page Object Model (POM) und Allure Reporting.
+Willkommen im offiziellen Test-Framework für die TestShop Applikation. Dieses Repository bietet eine professionelle, entkoppelte Test-Umgebung, die unabhängig von der eigentlichen Web-Applikation entwickelt und ausgeführt werden kann.
 
 ---
 
-## 🛠️ System-Voraussetzungen
+## 🛠️ Schritt-für-Schritt Einrichtung
 
-Stellen Sie sicher, dass folgende Komponenten installiert sind:
-*   **Runtime:** [Node.js](https://nodejs.org/) (v18+ LTS empfohlen)
-*   **Version Control:** [Git](https://git-scm.com/)
-*   **IDE:** Google Antigravity oder Visual Studio Code
-*   **Optional:** [Docker Desktop](https://www.docker.com/) (für isolierte Testläufe)
+### 1. Grundvoraussetzungen installieren
+Bevor der erste Test laufen kann, müssen drei Werkzeuge auf dem Computer vorhanden sein:
 
----
+*   **Node.js (Laufzeitumgebung):** [Hier herunterladen](https://nodejs.org/). Wähle die Version **"LTS"** (Long Term Support). Dies erlaubt es, JavaScript-Code auf dem Rechner auszuführen.
+*   **Git (Versionsverwaltung):** [Hier herunterladen](https://git-scm.com/). Git wird benötigt, um den Programmcode vom Server zu laden und Änderungen zu speichern.
+*   **IDE (Editor):** Empfohlen ist **Google Antigravity** oder **Visual Studio Code**. Dies ist das Schreibprogramm für den Testcode.
 
-## 🚀 Setup & Installation
-
-1.  **Dependencies installieren:**
-    ```bash
-    npm install
-    ```
-2.  **Playwright Browser Engines bereitstellen:**
-    ```bash
-    npx playwright install --with-deps
-    ```
-
----
-
-## 🏃 Test-Ausführung
-
-Das Framework ist vorkonfiguriert für das Testing gegen die Production-Umgebung:  
-👉 `https://testshop-dusky.vercel.app`
-
-### Execution Modes
-*   **Headless (Default/CI):** `npm run test:e2e`
-*   **Headed (Visual Debugging):** `HEADLESS=false npm run test:e2e`
-*   **Full Cycle:** `npm run test:full-cycle` (Execute -> Generate Allure -> Open Dashboard)
-
-### Environment Management (BASE_URL)
-Das Ziel-System kann dynamisch über Umgebungsvariablen gesteuert werden:
+### 2. Projekt kopieren & Repository klonen
+Öffne ein Terminal (oder die Eingabeaufforderung) und führe folgenden Befehl aus, um die Dateien auf den Rechner zu kopieren:
 ```bash
-# Testen gegen lokale Instanz
-BASE_URL=http://localhost:3000 npm run test:e2e
-
-# Testen gegen QA-Instanz
-BASE_URL=https://qa.testshop.com npm run test:e2e
+git clone <repository-url>
+cd testshop-playwright-template
 ```
-*Vordefinierte Profile (QA/Staging/Prod) können via `TEST_ENV` Variable genutzt werden (z.B. `npm run test:qa`).*
+
+### 3. Installation der Programm-Module
+Innerhalb des Projektordners müssen die notwendigen Pakete (wie Playwright) installiert werden:
+```bash
+# Installiert alle benötigten Bibliotheken aus der package.json
+npm install
+
+# Installiert die Browser-Engines (Chromium, Firefox, Safari), die zum Testen genutzt werden
+npx playwright install --with-deps
+```
 
 ---
 
-## 📊 Reporting & Analyse
+## 🏃 Test-Ausführung: Strategien im Überblick
 
-Nach Testabschluss stehen folgende Reporting-Tools in `/reporting` zur Verfügung:
+Das Framework bietet maximale Flexibilität, je nachdem ob man schnell etwas validieren oder tief in die Entwicklung einsteigen möchte.
 
-1.  **Allure Report:** Erweitertes Dashboard mit Trend-Analysen (`npm run report:open`).
-2.  **Playwright HTML Report:** Technisches Reporting mit Videos, Screenshots und Traces (in `reporting/playwright/index.html`).
+### Übersichtstabelle der Test-Strategien
+
+| Strategie | Ziel-Umgebung | Befehl | Modus | Geeignet für... |
+| :--- | :--- | :--- | :--- | :--- |
+| **Cloud Check** | Vercel (Live) | `npm run test:prod` | Rechner → Cloud | Schnelle Validierung der Live-Seite |
+| **Voll-Isoliert** | Docker (Lokal) | `npm run test:local` | Container → Container | Professionelle Entwicklung, Identisch zur Pipeline |
+| **Hybrid (Dev)** | Docker (Lokal) | `npm run test:e2e` | Rechner → Container | Aktive Test-Entwicklung (mit Browser UI) |
+| **Debugging** | Variabel | `npm run test:debug` | Sichtbare UI | Fehlersuche im Browser |
 
 ---
+
+### Die Strategien im Detail
+
+#### 1. Testen gegen die Cloud (Vercel) ☁️
+**Einsatz:** Ideal für den schnellen Start oder zur Prüfung nach einem Deployment.
+*   **Vorteil:** Keine lokale Webshop-Installation nötig.
+*   **Befehl:** `npm run test:prod`
+*   **Funktionsweise:** Die Tests laufen auf deinem Rechner, steuern aber die Webseite im Internet (`https://testshop-dusky.vercel.app`) an.
+
+#### 2. Lokales Voll-Setup (Full Docker) 🐳
+**Einsatz:** Der Goldstandard für lokale Entwicklung.
+*   **Voraussetzung:** [Docker Desktop](https://www.docker.com/) muss laufen.
+*   **Befehl:** `npm run test:local`
+*   **Funktionsweise:** Docker startet automatisch den Webshop und einen zweiten Container für die Tests. Alles ist zu 100% isoliert und identisch zur späteren Pipeline.
+
+#### 3. Hybrid-Modus (Für Entwickler) 💻 + 🐳
+**Einsatz:** Wenn man neue Tests schreibt und den Browser dabei sehen möchte (Headed Mode).
+*   **Schritt 1:** Starte nur den Webshop in Docker: `docker compose up app`
+*   **Schritt 2:** Starte die Tests von deinem Rechner aus: `npm run test:e2e`
+*   **Vorteil:** Du kannst die Playwright-Entwicklerwerkzeuge (UI Mode, Debugger) auf deinem Desktop nutzen, während die App stabil im Container läuft.
+
+#### 4. Gezieltes Debugging & UI-Mode 🔍
+Standardmäßig laufen Tests im Hintergrund ("headless"). Um "zuzuschauen" oder Fehler zu suchen:
+*   **Playwright Inspector:** `npm run test:debug` (Öffnet das Tool für Schritt-für-Schritt Analyse).
+*   **Headed Mode:** `HEADLESS=false npm run test:prod`
+*   **UI Mode:** `npx playwright test --ui` (Bietet eine grafische Oberfläche für die Test-Ausführung).
+
+
+---
+
+## 📊 Ergebnisse analysieren & Berichte erstellen
+
+Nach jedem Testlauf werden detaillierte Berichte erstellt. Hierfür stehen zwei Systeme zur Verfügung:
+
+### 1. Allure Report (Grafisches Dashboard)
+Allure bietet eine visuelle Aufbereitung der Testergebnisse mit Trends und Fehleranalysen.
+
+**Der vollständige Zyklus (manuell):**
+Um einen Bericht mit Historie zu erstellen, folgen diese Befehle aufeinander:
+1.  **Historie sichern:** `npm run report:history` (kopiert vergangene Ergebnisse für Trend-Analysen).
+2.  **Bericht generieren:** `npm run report:generate` (erzeugt das Dashboard aus den aktuellen Rohdaten).
+3.  **Bericht öffnen:** `npm run report:open` (startet einen lokalen Server zur Ansicht).
+
+**Abkürzung (Full Cycle):**
+```bash
+npm run test:full-cycle
+```
+*Dieser Befehl führt Tests aus, sichert die Historie, generiert den Bericht und öffnet ihn automatisch.*
+
+### 2. Playwright HTML Report (Technische Details)
+Für eine schnelle Analyse einzelner Fehler inklusive Videos, Screenshots und Netzwerk-Logs direkt im Browser:
+```bash
+npx playwright show-report reporting/playwright
+```
+Alternativ kann die Datei `reporting/playwright/index.html` direkt im Browser geöffnet werden.
+
+---
+
+## 🧹 Aufräumen & Archivierung
+
+Um die Testumgebung sauber zu halten, können folgende Befehle genutzt werden:
+*   **Daten löschen:** `npm run report:clean` (löscht alle bisherigen Testergebnisse und Berichte).
+*   **Archivieren:** `npm run report:archive` (speichert den aktuellen Bericht mit Zeitstempel im Ordner `reporting/archive/`).
+
 
 ## 🏗️ Framework Architektur
 
-Die Suite folgt professionellen Standards für Wartbarkeit und Stabilität:
-*   **Page Object Model (POM):** Kapselung von Selektoren und Page-Logik in Klassen (`pages/`).
-*   **Fixtures:** Automatisierte Instanziierung von Page Objects in Tests (`fixtures/base-test.ts`).
-*   **Data-Driven Testing:** Nutzung von `@faker-js/faker` für realistische, dynamische Testdaten.
-*   **Docker Integration:** Vollständige CI/CD-Kongruenz durch containerisierte Ausführung (`docker compose up --build`).
+*   **Page Object Model (POM):** Jeder Bereich der Website (Warenkorb, Login, Shop) hat eine eigene Datei im Ordner `pages/`. Das macht den Code übersichtlich.
+*   **Fixtures:** Automatisierte Abläufe (wie "immer einloggen vor dem Test") sind in `fixtures/base-test.ts` definiert.
+*   **Dynamic Data:** Wir nutzen `@faker-js/faker`, um bei jedem Testlauf realistische Zufallsdaten (Namen, Adressen) zu erzeugen.
+*   **Config-Management:** URLs und Zugangsdaten liegen sicher in `.env`-Dateien im Ordner `config/`.
