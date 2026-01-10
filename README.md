@@ -1,94 +1,68 @@
-# Playwright E2E Test Template 🎭
+# Playwright E2E Framework Template 🎭
 
-Willkommen in deiner neuen E2E-Testumgebung! Dieses Repository ist deine Basis für die Automatisierung des **TestShops**. Es bietet eine industrietaugliche Architektur (Page Object Model), professionelles Reporting (Allure) und volle Flexibilität für verschiedene Testumgebungen.
-
----
-
-## 🛠️ Phase 1: Vorbereitung (Voraussetzungen)
-
-Bevor du mit dem Testen startest, musst du deinen Arbeitsplatz einrichten.
-
-### 1. IDE (Dein Arbeitsplatz)
-Wir empfehlen **Google Antigravity** oder **VS Code**. Hier wirst du deinen Test-Code schreiben und ausführen.
-
-### 2. Node.js (Die "Maschine")
-Playwright basiert auf Node.js.
-*   Lade die **LTS Version** von [nodejs.org](https://nodejs.org/) herunter und installiere sie.
-*   Prüfe die Installation im Terminal: `node -v` (sollte v18 oder höher sein).
-
-### 3. Git (Versionskontrolle)
-Du brauchst Git, um deinen Code zu speichern und hochzuladen.
-*   Installation: [git-scm.com](https://git-scm.com/)
-
-### 4. Docker (Optionale CI-Simulation)
-Um Tests in einer isolierten Linux-Umgebung zu simulieren, installiere [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+Professional End-to-End Test Suite für die TestShop Applikation. Dieses Repository implementiert eine skalierbare Test-Architektur basierend auf dem Page Object Model (POM) und Allure Reporting.
 
 ---
 
-## 🚀 Phase 2: Projekt-Setup
+## 🛠️ System-Voraussetzungen
 
-Öffne dieses Repository in deiner IDE und führe im Terminal folgende Schritte aus:
+Stellen Sie sicher, dass folgende Komponenten installiert sind:
+*   **Runtime:** [Node.js](https://nodejs.org/) (v18+ LTS empfohlen)
+*   **Version Control:** [Git](https://git-scm.com/)
+*   **IDE:** Google Antigravity oder Visual Studio Code
+*   **Optional:** [Docker Desktop](https://www.docker.com/) (für isolierte Testläufe)
 
-1.  **Abhängigkeiten installieren:**
+---
+
+## 🚀 Setup & Installation
+
+1.  **Dependencies installieren:**
     ```bash
     npm install
     ```
-2.  **Browser-Engines installieren:**
+2.  **Playwright Browser Engines bereitstellen:**
     ```bash
     npx playwright install --with-deps
     ```
 
 ---
 
-## 🏃 Phase 3: Tests ausführen
+## 🏃 Test-Ausführung
 
-Dieses Template ist so vorkonfiguriert, dass es sofort gegen die Live-Instanz des Shops testet:
-👉 [https://testshop-dusky.vercel.app](https://testshop-dusky.vercel.app)
+Das Framework ist vorkonfiguriert für das Testing gegen die Production-Umgebung:  
+👉 `https://testshop-dusky.vercel.app`
 
-### Ausführungs-Modi
-*   **Standard (Headless):** `npm run test:e2e` (Schnell, ohne sichtbare Fenster).
-*   **Mit Bild (Headed):** `HEADLESS=false npm run test:e2e` (Gut für Debugging).
-*   **Full Cycle:** `npm run test:full-cycle` (Führt Tests aus, generiert Berichte und öffnet das Dashboard automatisch).
+### Execution Modes
+*   **Headless (Default/CI):** `npm run test:e2e`
+*   **Headed (Visual Debugging):** `HEADLESS=false npm run test:e2e`
+*   **Full Cycle:** `npm run test:full-cycle` (Execute -> Generate Allure -> Open Dashboard)
 
----
-
-## 🌍 Phase 4: Flexibles Testen (Umgebungs-Variablen)
-
-Du kannst die Ziel-URL bei jedem Befehl einfach mitgeben, um gegen andere Instanzen (z.B. deinen lokalen Shop) zu testen:
-
+### Environment Management (BASE_URL)
+Das Ziel-System kann dynamisch über Umgebungsvariablen gesteuert werden:
 ```bash
-# Testen gegen lokalen Shop
+# Testen gegen lokale Instanz
 BASE_URL=http://localhost:3000 npm run test:e2e
 
-# Testen gegen eine QA-Umgebung
-BASE_URL=https://qa.meine-app.de npm run test:e2e
+# Testen gegen QA-Instanz
+BASE_URL=https://qa.testshop.com npm run test:e2e
 ```
-
-**Config-Profile:** Nutze `npm run test:qa` oder `npm run test:prod`, um vordefinierte Einstellungen aus dem `config/`-Ordner zu laden.
-
----
-
-## 📊 Phase 5: Reporting & Analyse
-
-Nach den Tests stehen dir zwei Reports zur Verfügung:
-
-1.  **Allure Dashboard:** `npm run report:open` (Wunderschöne Graphen und Historie).
-2.  **Playwright HTML:** Öffne `reporting/playwright/index.html` (Videos, Screenshots und Traces bei Fehlern).
+*Vordefinierte Profile (QA/Staging/Prod) können via `TEST_ENV` Variable genutzt werden (z.B. `npm run test:qa`).*
 
 ---
 
-## 🏗️ Architektur (Der "Rote Faden")
+## 📊 Reporting & Analyse
 
-Damit dein Code wartbar bleibt, halten wir uns an diese Regeln:
-*   **Page Object Model (POM):** Jede Seite wird durch eine Klasse in `pages/` abgebildet. Ändert sich ein Button-Layout, musst du es nur an einer Stelle im POM korrigieren.
-*   **Data-Driven:** Testdaten kommen aus dem `data/`-Ordner oder werden via `@faker-js/faker` generiert.
-*   **Fixtures:** Seiten werden automatisch in die Tests injiziert (`fixtures/base-test.ts`), was den Code extrem sauber hält.
+Nach Testabschluss stehen folgende Reporting-Tools in `/reporting` zur Verfügung:
+
+1.  **Allure Report:** Erweitertes Dashboard mit Trend-Analysen (`npm run report:open`).
+2.  **Playwright HTML Report:** Technisches Reporting mit Videos, Screenshots und Traces (in `reporting/playwright/index.html`).
 
 ---
 
-## 🌿 Dein Workflow als Consultant
+## 🏗️ Framework Architektur
 
-1.  **Branch erstellen:** `git checkout -b feature/mein-name-tests`.
-2.  **Tests schreiben:** Nutze existierende Tests in `e2e/` als Vorlage.
-3.  **Lokal validieren:** Nutze `npm run test:full-cycle`.
-4.  **Committen & Pushen:** Teile deine Ergebnisse mit dem Team!
+Die Suite folgt professionellen Standards für Wartbarkeit und Stabilität:
+*   **Page Object Model (POM):** Kapselung von Selektoren und Page-Logik in Klassen (`pages/`).
+*   **Fixtures:** Automatisierte Instanziierung von Page Objects in Tests (`fixtures/base-test.ts`).
+*   **Data-Driven Testing:** Nutzung von `@faker-js/faker` für realistische, dynamische Testdaten.
+*   **Docker Integration:** Vollständige CI/CD-Kongruenz durch containerisierte Ausführung (`docker compose up --build`).
