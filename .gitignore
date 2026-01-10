@@ -1,5 +1,6 @@
 node_modules/
 reporting/
 test-results/
-.env
+
+# Private overrides stay ignored
 .env.local

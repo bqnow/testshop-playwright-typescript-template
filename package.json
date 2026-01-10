@@ -5,9 +5,11 @@
     "description": "Standalone Playwright E2E Test Suite for TestShop",
     "scripts": {
         "test:e2e": "playwright test",
-        "test:qa": "TEST_ENV=qa BASE_URL=https://qa.testshop.com playwright test",
-        "test:staging": "TEST_ENV=staging BASE_URL=https://staging.testshop.com playwright test",
-        "test:prod": "TEST_ENV=prod BASE_URL=https://testshop.com playwright test",
+        "test:local": "docker compose up --build --exit-code-from playwright",
+        "test:qa": "TEST_ENV=qa playwright test",
+        "test:staging": "TEST_ENV=staging playwright test",
+        "test:prod": "TEST_ENV=prod playwright test",
+        "test:debug": "PWDEBUG=1 playwright test",
         "test:full-cycle": "npm run report:history && npm run test:e2e || true && npm run report:generate && npm run report:archive && npm run report:open",
         "report:history": "mkdir -p reporting/allure-results/history && cp -r reporting/allure-report/history/* reporting/allure-results/history/ || true",
         "report:generate": "allure generate reporting/allure-results -o reporting/allure-report --clean",
@@ -18,6 +20,7 @@
     "devDependencies": {
         "@faker-js/faker": "^10.2.0",
         "@playwright/test": "^1.57.0",
+        "@types/node": "^25.0.6",
         "allure-commandline": "^2.36.0",
         "allure-playwright": "^3.4.4",
         "dotenv": "^17.2.3",
