@@ -27,7 +27,7 @@ services:
       app:
         condition: service_healthy
     environment:
-      - BASE_URL=http://app:3000
+      - BASE_URL=${BASE_URL:-http://app:3000}
       - CI=true
       - SKIP_WEBKIT=true
       - TEST_USER_NAME
