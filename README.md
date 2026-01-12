@@ -284,7 +284,7 @@ Dieses Framework ist für die automatisierte Ausführung vorbereitet:
 *   **GitHub Actions:** Bei jedem `push` auf den `main` Branch wird automatisch der `test:docker` Workflow auf GitHub ausgeführt.
 *   **Artifacts:** Nach dem Lauf werden die Berichte (Screenshots & Allure-Results) als GitHub-Artifacts hochgeladen und können dort heruntergeladen werden.
 
-📘 **Die detaillierte Architektur-Beschreibung findest du hier: [WORKFLOW_STRATEGY.md](./WORKFLOW_STRATEGY.md)**
+📘 **Die detaillierte Architektur-Beschreibung findest du hier: [WORKFLOW_STRATEGY.md](WORKFLOW_STRATEGY.md)**
 
 ---
 
