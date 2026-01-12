@@ -1,46 +1,92 @@
-# 🚀 Push & Test Strategie: Separate Test Repository Strategy (Target & Template)
+# 🏗️ Architektur & CI/CD Workflow Strategie
 
-Dieses Dokument beschreibt die Prozesse für dieses **entkoppelte Setup** ("Separate Test Repository"), unterteilt in zwei Zielgruppen:
+## 1. Architektur-Konzept: "Separate Test Repository"
+Dieses Projekt folgt streng dem **"Decoupled Architecture"** Ansatz (Entkoppelte Architektur). Der Applikationscode und der Test-Automatisierungscode liegen in zwei vollständig getrennten Repositories. Dies spiegelt ein professionelles Umfeld wider, in dem QA/SDET-Teams oft unabhängig von Feature-Entwicklern arbeiten.
 
-1.  **Maintainer (Wir):** Die dieses Template und die Shop-App pflegen.
-2.  **Consultants (Teilnehmer):** Die eigene Test-Repos aufbauen sollen.
+*   **Zielsystem (Die App):** `bqnow-testapp`
+*   **Testsystem (Die Tests):** `testshop-playwright-template`
 
----
-
-## A. Maintainer Workflow (Interne Qualitätssicherung)
-Wie stellen wir sicher, dass App und Template harmonieren?
-
-### 1. Lokale Entwicklung (Der "Hot Loop")
-*Ziel: Schnelles Feedback für uns als Entwickler der Plattform.*
-
-*   **Terminal 1 (Applikation):** `cd ../bqnow-testapp && npm run dev`
-*   **Terminal 2 (Tests):** `npm run play` (gegen localhost)
-
-### 2. Pre-Push Check (Validierung)
-*   **Änderung am Shop?** -> Muss `npm run play` im Template bestehen. Pushed nach `latest`.
-*   **Änderung am Template?** -> Muss gegen `ghcr.io/bqnow/testshop:latest` bestehen.
-
-### 3. CI/CD Pipeline & Versionierung
-Damit Consultants eine stabile Basis haben, nutzen wir **Semantic Versioning** im Shop-Repo.
-*   `main` Branch updates -> `ghcr.io/bqnow/testshop:latest` (Unstable/Bleeding Edge)
-*   Git Tag `v1.0.1` -> `ghcr.io/bqnow/testshop:1.0.1` (Stabil für Schulungen)
-
-**WICHTIG:** Schulungsunterlagen sollten immer auf eine feste Version (z.B. `v1.x`) referenzieren, nicht auf `latest`, damit Workshops nicht durch Updates kaputt gehen.
+### Die Kopplung: Docker
+Das verbindende Glied zwischen diesen beiden Welten ist **Docker**.
+*   Der einzige Output des App-Repos ist ein **Docker Image** (`ghcr.io/bqnow/testshop`).
+*   Das Test-Repo sieht *niemals* den Quellcode der App. Es konsumiert lediglich dieses kompilierte Docker Image.
 
 ---
 
-## B. Consultant Workflow (Das Schulungs-Ziel)
-Wie arbeiten die Teilnehmer?
+## 2. CI/CD Pipeline Ablauf (Der "Twin-Repo" Link)
 
-Das Ziel ist, dass Consultants verstehen, wie man eine **eigene** Test-Pipeline baut. Dieses Repository dient dabei als "Golden Master" oder Lösungsvorschlag.
+Wir haben eine automatisierte Verbindung zwischen den beiden Repositories eingerichtet, um kontinuierliche Qualitätssicherung zu gewährleisten.
 
-### Das Szenario für Consultants:
-1.  **Setup:** Sie erstellen ein *leeres* Repo (oder nutzen `npm init playwright`).
-2.  **Target:** Sie binden den Shop als Docker Container ein (`docker-compose.yml` referenziert `ghcr.io/bqnow/testshop:stable`).
-3.  **Lernen:**
-    *   Sie schreiben Tests gegen den Container.
-    *   Sie bauen ihre eigene GitHub Actions Pipeline.
-    *   Sie lernen, wie man Testdaten-Management betreibt.
+### Phase 1: Artefakt & Trigger (Shop Repo)
+**Auslöser:** Push auf `main` in `bqnow-testapp`.
 
-### Unsere Aufgabe dabei:
-Wir nutzen dieses Template-Repo, um zu beweisen, dass der Shop ("System under Test") testbar ist. Wenn unsere Tests hier grün sind, wissen wir: **"Das Problem liegt beim Schüler, nicht an der App."** 😉
+1.  **Build:** GitHub Actions baut die Next.js App und verpackt sie in einen leichtgewichtigen Docker Container.
+2.  **Publish:** Das Image wird in die GitHub Container Registry (GHCR) geladen (Tag: `:latest`).
+3.  **Dispatch:** Ein `repository_dispatch` Event (`app-update`) wird an das Test-Repo gesendet, mit der Info `{"image_tag": "latest"}`.
+
+### Phase 2: Verifizierung (Test Repo)
+**Auslöser:** Empfang von `repository_dispatch` ODER lokaler Push auf `main`.
+
+1.  **Setup:** Der Workflow startet eine Docker Compose Umgebung.
+2.  **Pull:** Er zieht exakt die Image-Version, die im Event gemeldet wurde (oder `latest`).
+3.  **Test:** Playwright Tests laufen gegen diese kurzlebige Container-Instanz.
+4.  **Report:** Ergebnisse werden generiert (Allure/HTML) und als Artefakt gespeichert.
+
+---
+
+## 3. Daten- & Effizienz-Strategie
+
+Diese Architektur ermöglicht unterschiedliche Test-Geschwindigkeiten je nach Kontext:
+
+| Kontext | Wann / Wo? | Genutzte Architektur | Geschwindigkeit |
+| :--- | :--- | :--- | :--- |
+| **Hot Development** | Localhost | App (Node.js) + Tests (Node.js) laufen parallel in Terminals. | ⚡️ **Am schnellsten** (Kein Docker Build) |
+| **Pre-Push Check** | Localhost | App läuft im lokalen Docker Container (isoliert). | 🐢 **Pro** (Verifiziert den Container) |
+| **CI / Regression** | GitHub Actions | Vollautomatische Pipeline via GHCR. | 🛡️ **Stabil** (Saubere Umgebung) |
+
+---
+
+## 4. Visuelles Architektur-Diagramm
+
+```mermaid
+graph TD
+    subgraph "Entwickler Umgebung"
+        Dev[Entwickler]
+        LocalApp[Lokale App (localhost:3000)]
+        LocalTest[Lokales Playwright]
+        Dev -->|Code Änderung| LocalApp
+        Dev -->|Tests starten| LocalTest
+        LocalTest -.->|Testet via HTTP| LocalApp
+    end
+
+    subgraph "CI/CD Pipeline: Shop Repo"
+        Push[Push auf Main]
+        Build[Docker Image Bauen]
+        PushGHCR[Push zu GHCR]
+        Trigger[Trigger 'app-update']
+        
+        Dev -->|git push| Push
+        Push --> Build
+        Build --> PushGHCR
+        PushGHCR --> Trigger
+    end
+
+    subgraph "Artefakt Speicher"
+        GHCR[(GitHub Container Registry)]
+        PushGHCR -.->|Speichert Image| GHCR
+    end
+
+    subgraph "CI/CD Pipeline: Test Repo"
+        Listen[Empfange Dispatch]
+        Pull[Docker Compose Up]
+        RunTest[Playwright Tests]
+        
+        Trigger -.->|Event Senden| Listen
+        Listen --> Pull
+        GHCR -.->|Pull :latest| Pull
+        Pull --> RunTest
+    end
+    
+    style Dev fill:#f9f,stroke:#333
+    style GHCR fill:#58a6ff,stroke:#333,color:#fff
+```
