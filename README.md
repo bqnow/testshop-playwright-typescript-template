@@ -118,6 +118,23 @@ Alle Zugangsdaten werden zentral aus den `.env`-Dateien geladen, wobei lokale Da
 
 ---
 
+### 🌐 Testen in Vercel-Umgebungen
+
+Dieses Framework ist darauf vorbereitet, gegen verschiedene Vercel-Stages zu testen. Die Steuerung erfolgt über die Umgebungsvariable `TEST_ENV`.
+
+| Befehl | Ziel-Umgebung | Beschreibung |
+| :--- | :--- | :--- |
+| `TEST_ENV=qa npx playwright test` | **QA (Preview)** | Testet gegen dynamische Vercel Preview URLs. |
+| `TEST_ENV=staging npx playwright test` | **Staging** | Testet gegen das Deployment des `main` Branches. |
+
+**Pro-Tipp (QA/Vercel Preview):**
+Um gegen eine ganz bestimmte Vercel Preview URL zu testen (z.B. aus einem PR), kannst du die URL direkt überschreiben:
+```bash
+TEST_ENV=qa BASE_URL=https://testshop-git-feature-xyz.vercel.app npx playwright test
+```
+
+---
+
 ## 🐳 Warum Docker?
 
 Docker ist der Schlüssel zur **Konsistenz und Isolation** in diesem Framework:

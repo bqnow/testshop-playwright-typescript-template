@@ -40,6 +40,10 @@ export default defineConfig({
         }]
     ],
     use: {
+        /* 
+         * Wichtig: process.env.BASE_URL hat Vorrang vor .env Dateien. 
+         * Dies erlaubt dynamische Vercel Preview URLs in der CI.
+         */
         baseURL: process.env.BASE_URL || 'http://localhost:3000',
         trace: 'on-first-retry',
         screenshot: 'only-on-failure',
