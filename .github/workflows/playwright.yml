@@ -24,15 +24,15 @@ jobs:
 
     - name: Run Tests in Docker
       env:
-        # These secrets are Organization secrets in Github
+        # Diese Secrets müssen in den GitHub Organization Secrets hinterlegt sein (bqnow)
         TEST_USER_NAME: ${{ secrets.TEST_USER_NAME }}
         TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-        # Use tag from dispatch event or default to latest
+        # Nutzt den dynamischen Tag aus dem Event (oder 'latest' als Fallback)
         SHOP_IMAGE_TAG: ${{ github.event.client_payload.image_tag || 'latest' }}
       run: docker compose up --build --exit-code-from playwright
 
     - name: Upload Reporting Artifacts
-      if: always()
+      if: always() # Auch bei fehlgeschlagenen Tests ausführen
       uses: actions/upload-artifact@v4
       with:
         name: reporting-artifacts

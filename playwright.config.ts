@@ -3,22 +3,22 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 
 /**
- * Environment Configuration:
- * We load variables from .env files using a "Priority wins" approach.
- * Once a variable is set (by CLI or an earlier file), it won't be overridden.
- * Priority: 1. CLI/Environment, 2. .env.local, 3. .env.{stage}, 4. .env
+ * Umgebungs-Konfiguration:
+ * Wir laden Variablen aus .env Dateien nach dem "Prioritäts-Prinzip".
+ * Sobald eine Variable gesetzt ist (durch CLI oder eine frühere Datei), wird sie nicht überschrieben.
+ * Priorität: 1. CLI/Environment, 2. .env.local, 3. .env.{stage}, 4. .env
  */
 const configDir = path.resolve(__dirname, 'config');
 
-// 1. Load local overrides first so they win
+// 1. Lokale Overrides gewinnen (z.B. für eigene Secrets)
 dotenv.config({ path: path.resolve(configDir, '.env.local') });
 
-// 2. Load environment-specific file
+// 2. Lade Umgebungsspezifische Datei (z.B. .env.staging)
 if (process.env.TEST_ENV) {
     dotenv.config({ path: path.resolve(configDir, `.env.${process.env.TEST_ENV}`) });
 }
 
-// 3. Load default values as fallback
+// 3. Lade Standardwerte als Fallback
 dotenv.config({ path: path.resolve(configDir, '.env') });
 
 /**
@@ -48,12 +48,12 @@ export default defineConfig({
         ignoreHTTPSErrors: true, // Crucial for Docker-internal networking
     },
 
-    // Visual Regression Testing Configuration
+    // Visuelle Regressions-Tests Konfiguration
     expect: {
         toHaveScreenshot: {
-            maxDiffPixels: 100,        // Allow minor rendering differences
-            threshold: 0.2,             // 20% threshold for pixel differences
-            animations: 'disabled',     // Disable animations for stable screenshots
+            maxDiffPixels: 100,         // Erlaube minimale Abweichungen (Rendering)
+            threshold: 0.2,             // 20% Toleranz für Pixel-Unterschiede
+            animations: 'disabled',     // Deaktiviere Animationen für stabile Screenshots
         },
     },
 

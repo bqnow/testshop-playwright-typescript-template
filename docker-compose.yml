@@ -1,20 +1,24 @@
 services:
 
-  # The Webshop Application
-  # In this template, we point to the expected Docker image of the main app
+  # Der Webshop (Die Ziel-Applikation)
+  # Hier nutzen wir das Docker-Image, das vom anderen Repository ("bqnow-testapp") gebaut wurde.
   app:
     image: ghcr.io/bqnow/testshop:${SHOP_IMAGE_TAG:-latest}
     ports:
       - "3000:3000"
     environment:
+      # WICHTIG: Zwingt Next.js (Standalone), auf allen Interfaces (0.0.0.0) zu hören.
+      # Ohne dies ist die App vom Playwright-Container aus nicht erreichbar.
       - HOSTNAME=0.0.0.0
     healthcheck:
+      # Nutzt 127.0.0.1 statt localhost, um DNS-Probleme in Alpine Linux zu umgehen.
       test: [ "CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000" ]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  # The Playwright Test Runner
+  # Der Playwright Test Runner
+  # Führt die Tests gegen den "app" Service aus.
   playwright:
     build:
       context: .
