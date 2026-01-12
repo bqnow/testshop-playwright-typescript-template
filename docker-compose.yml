@@ -3,7 +3,7 @@ services:
   # The Webshop Application
   # In this template, we point to the expected Docker image of the main app
   app:
-    image: ghcr.io/bqnow/testshop:latest
+    image: ghcr.io/bqnow/testshop:${SHOP_IMAGE_TAG:-latest}
     ports:
       - "3000:3000"
     healthcheck:
