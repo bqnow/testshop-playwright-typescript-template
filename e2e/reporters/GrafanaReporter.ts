@@ -99,12 +99,15 @@ class GrafanaReporter implements Reporter {
                 });
 
                 console.log(`📡 Response Status: ${response.status} ${response.statusText}`);
+                console.log(`URL: ${process.env.GRAFANA_LOKI_URL}`);
+                console.log(`User: ${process.env.GRAFANA_LOKI_USER}`);
+                console.log(`Key: ${process.env.GRAFANA_LOKI_KEY}`);
 
                 if (response.ok) {
                     console.log('✅ Metrics sent successfully!');
                 } else {
                     const errorBody = await response.text();
-                    console.error(`❌ Grafana API Error (${response.status}):`, errorBody);
+                    console.error(`❌ Grafana API Error(${response.status}): `, errorBody);
                 }
             } catch (error) {
                 console.error('❌ Failed to send metrics to Grafana:', error);
