@@ -30,7 +30,11 @@ services:
       - BASE_URL=${BASE_URL:-http://app:3000}
       - CI=true
       - SKIP_WEBKIT=true
+      - TEST_ENV
       - TEST_USER_NAME
       - TEST_USER_PASSWORD
+      - GRAFANA_LOKI_URL
+      - GRAFANA_LOKI_USER
+      - GRAFANA_LOKI_KEY
     volumes:
       - ./reporting:/app/reporting

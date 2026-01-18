@@ -51,8 +51,8 @@ java -version    # Sollte java version zeigen
 ### 2. Projekt kopieren & Repository klonen
 Öffne ein Terminal (oder die Eingabeaufforderung) und führe folgenden Befehl aus:
 ```bash
-git clone https://github.com/bqnow/testshop-playwright-template.git
-cd testshop-playwright-template
+git clone https://github.com/bqnow/testshop-playwright-typescript-template.git
+cd testshop-playwright-typescript-template
 ```
 
 ### 3. Installation der Programm-Module

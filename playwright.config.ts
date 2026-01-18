@@ -37,7 +37,8 @@ export default defineConfig({
             detail: true,
             resultsDir: 'reporting/allure-results',
             suiteTitle: false
-        }]
+        }],
+        ['./e2e/reporters/GrafanaReporter.ts']
     ],
     use: {
         /* 
