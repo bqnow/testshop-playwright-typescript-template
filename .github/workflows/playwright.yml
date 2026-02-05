@@ -28,7 +28,7 @@ jobs:
         TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
         # TEST-KONZEPT: Wir laden das aktuellste Image der App aus GHCR 
         # und testen die lokalen Tests dagegen.
-        BASE_URL: http://app:3000
+        BASE_URL: http://shop:3000
         SHOP_IMAGE_TAG: latest
         TEST_ENV: ci_template_check
         # GRAFANA INTEGRATION (Optional)
