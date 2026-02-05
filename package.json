@@ -5,7 +5,7 @@
     "description": "Standalone Playwright E2E Test Suite for TestShop",
     "scripts": {
         "play": "playwright test",
-        "app:up": "docker compose up -d app",
+        "app:up": "docker compose up -d shop",
         "app:down": "docker compose down",
         "test:e2e": "npm run play",
         "test:docker": "docker compose up --build --exit-code-from playwright",

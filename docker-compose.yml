@@ -2,7 +2,9 @@ services:
 
   # Der Webshop (Die Ziel-Applikation)
   # Hier nutzen wir das Docker-Image, das vom anderen Repository ("bqnow-testapp") gebaut wurde.
-  app:
+  # Der Webshop (Die Ziel-Applikation)
+  # Hier nutzen wir das Docker-Image, das vom anderen Repository ("bqnow-testapp") gebaut wurde.
+  shop:
     image: ghcr.io/bqnow/testshop:${SHOP_IMAGE_TAG:-latest}
     ports:
       - "3000:3000"
@@ -18,16 +20,16 @@ services:
       retries: 5
 
   # Der Playwright Test Runner
-  # Führt die Tests gegen den "app" Service aus.
+  # Führt die Tests gegen den "shop" Service aus.
   playwright:
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      app:
+      shop:
         condition: service_healthy
     environment:
-      - BASE_URL=${BASE_URL:-http://app:3000}
+      - BASE_URL=${BASE_URL:-http://shop:3000}
       - CI=true
       - SKIP_WEBKIT=true
       - TEST_ENV
