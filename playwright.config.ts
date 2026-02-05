@@ -65,7 +65,17 @@ export default defineConfig({
     projects: [
         {
             name: 'chromium',
-            use: { ...devices['Desktop Chrome'] },
+            use: {
+                ...devices['Desktop Chrome'],
+                launchOptions: {
+                    args: [
+                        // Verhindert automatisches HTTPS-Upgrade für HTTP-URLs (ERR_SSL_PROTOCOL_ERROR)
+                        '--disable-features=AutoupgradeMixedContent',
+                        '--no-first-run',
+                        '--disable-background-networking'
+                    ]
+                }
+            },
         },
         {
             name: 'firefox',
